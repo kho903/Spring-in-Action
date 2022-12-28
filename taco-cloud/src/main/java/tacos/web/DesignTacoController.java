@@ -13,24 +13,32 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.extern.slf4j.Slf4j;
 import tacos.Ingredient;
+import tacos.Order;
 import tacos.Taco;
 import tacos.data.IngredientRepository;
+import tacos.data.TacoRepository;
 
 @Slf4j
 @Controller
 @RequestMapping("/design")
+@SessionAttributes("order")
 public class DesignTacoController {
 
 	private final IngredientRepository ingredientRepository;
 
+	private TacoRepository tacoRepository;
+
 	@Autowired
-	public DesignTacoController(IngredientRepository ingredientRepository) {
+	public DesignTacoController(IngredientRepository ingredientRepository, TacoRepository tacoRepository) {
 		this.ingredientRepository = ingredientRepository;
+		this.tacoRepository = tacoRepository;
 	}
 
 	@GetMapping
@@ -56,13 +64,25 @@ public class DesignTacoController {
 			.collect(Collectors.toList());
 	}
 
+	@ModelAttribute(name = "order")
+	public Order order() {
+		return new Order();
+	}
+
+	@ModelAttribute(name = "taco")
+	public Taco taco() {
+		return new Taco();
+	}
+
 	@PostMapping
-	public String processDesign(@Valid Taco design, Errors errors) {
+	public String processDesign(@Valid Taco design, Errors errors,
+			@ModelAttribute Order order) {
 		if (errors.hasErrors()) {
 			return "design";
 		}
-		// TODO: 이 지점에서 타코 디자인(선택된 식자재 내역)을 저장.
-		log.info("Processing design: " + design);
+
+		Taco saved = tacoRepository.save(design);
+		order.addDesign(saved);
 
 		return "redirect:/orders/current";
 	}
