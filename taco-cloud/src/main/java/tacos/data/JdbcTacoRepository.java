@@ -30,7 +30,7 @@ public class JdbcTacoRepository implements TacoRepository {
 		for (Ingredient ingredient : taco.getIngredients()) {
 			saveIngredientToTaco(ingredient, tacoId);
 		}
-		return null;
+		return taco;
 	}
 
 	private long saveTacoInfo(Taco taco) {
