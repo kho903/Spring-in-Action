@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.withUser("user2")
 				.password("{noop}password2")
 				.authorities("ROLE_USER");*/
-		auth
+		/*auth
 			.jdbcAuthentication()
 			.dataSource(dataSource)
 			.usersByUsernameQuery(
@@ -45,7 +45,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.authoritiesByUsernameQuery(
 				"select username, authority from authorities "
 					+ "where username=?")
-			.passwordEncoder(new NoEncodingPasswordEncoder())
+			.passwordEncoder(new NoEncodingPasswordEncoder())*/
+		auth
+			.ldapAuthentication()
+			.userSearchBase("ou=people")
+			.userSearchFilter("(uid={0})")
+			.groupSearchBase("ou=groups")
+			.groupSearchFilter("member={0}")
+			.contextSource()
+			.root("dc=tacocloud,dc=com")
+			.ldif("classpath:users.ldif")
+			.and()
+			.passwordCompare()
+			.passwordEncoder(new BCryptPasswordEncoder())
+			.passwordAttribute("userPasscode")
 		;
 	}
 }
