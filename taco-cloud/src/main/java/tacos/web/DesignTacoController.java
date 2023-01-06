@@ -30,7 +30,7 @@ import tacos.data.UserRepository;
 
 @Slf4j
 @Controller
-@RequestMapping("/design")
+@RequestMapping("/design/v1")
 @SessionAttributes("order")
 public class DesignTacoController {
 
